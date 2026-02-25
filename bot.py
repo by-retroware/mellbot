@@ -2,17 +2,19 @@ import os
 import asyncio
 import random
 import re
+import tempfile
+import yt_dlp
 from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import ChatPermissions
+from aiogram.types import ChatPermissions, FSInputFile
 from aiogram.exceptions import TelegramBadRequest
 from aiohttp import web
 
 TOKEN = "8558117158:AAG9MRnBKXqnTlWdPd_SxSM9JOfWyFAEwzw"
 
 # ================ ТВОЙ ID ================
-OWNER_ID = 5695593671  # твой ID
+OWNER_ID = 5695593671
 
 # ================ БИБЛИОТЕКА ВИДЕО ================
 VIDEO_LIBRARY = [
@@ -42,6 +44,44 @@ VIDEO_LIBRARY = [
     {"name": "омайгад нихуя", "url": "https://vt.tiktok.com/ZSmquUGBW/"},
     {"name": "мамино золотце", "url": "https://vt.tiktok.com/ZSmquHoSy/"},
 ]
+
+# ================ ФУНКЦИЯ СКАЧИВАНИЯ ВИДЕО ================
+
+async def download_video(url):
+    """Скачивает видео и возвращает путь к файлу"""
+    try:
+        # Создаём временную папку
+        temp_dir = tempfile.mkdtemp()
+        
+        # Настройки yt-dlp
+        ydl_opts = {
+            'format': 'mp4',
+            'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
+            'quiet': True,
+            'no_warnings': True,
+        }
+        
+        loop = asyncio.get_event_loop()
+        
+        def download():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                filename = ydl.prepare_filename(info)
+                
+                # Если файл не найден, ищем любой mp4
+                if not os.path.exists(filename):
+                    for f in os.listdir(temp_dir):
+                        if f.endswith('.mp4'):
+                            return os.path.join(temp_dir, f)
+                return filename if os.path.exists(filename) else None
+        
+        # Запускаем скачивание в отдельном потоке
+        file_path = await loop.run_in_executor(None, download)
+        return file_path if file_path else None
+        
+    except Exception as e:
+        print(f"Ошибка скачивания: {e}")
+        return None
 
 # ================ СЛОВАРИ ДЛЯ ПЕРЕВОДА ================
 MURIN_CORE = {
@@ -216,19 +256,41 @@ async def cmd_videos(message: types.Message):
 @dp.message(Command("video"))
 async def cmd_video(message: types.Message):
     args = message.text.split()
+    
     if len(args) < 2:
         await message.reply("❌ Укажи номер видео\nПример: /video 5")
         return
+    
     try:
         num = int(args[1]) - 1
         if num < 0 or num >= len(VIDEO_LIBRARY):
             await message.reply(f"❌ Номер должен быть от 1 до {len(VIDEO_LIBRARY)}")
             return
+        
         video = VIDEO_LIBRARY[num]
-        await message.reply(
-            f"🎥 **{video['name']}**\n\n{video['url']}",
-            disable_web_page_preview=False
-        )
+        
+        # Отправляем статус
+        status_msg = await message.reply(f"⏬ Скачиваю: {video['name']}...")
+        
+        # Скачиваем видео
+        file_path = await download_video(video['url'])
+        
+        if file_path and os.path.exists(file_path):
+            # Отправляем видео
+            await message.reply_video(
+                video=FSInputFile(file_path),
+                caption=f"🎥 {video['name']}"
+            )
+            
+            # Удаляем временный файл
+            os.unlink(file_path)
+            os.rmdir(os.path.dirname(file_path))
+            
+            # Удаляем статус
+            await status_msg.delete()
+        else:
+            await status_msg.edit_text(f"❌ Не удалось скачать видео: {video['name']}\nПопробуй позже.")
+        
     except ValueError:
         await message.reply("❌ Номер должен быть числом")
 
@@ -237,11 +299,30 @@ async def cmd_randomvideo(message: types.Message):
     if not VIDEO_LIBRARY:
         await message.reply("📭 Видео пока нет")
         return
+    
     video = random.choice(VIDEO_LIBRARY)
-    await message.reply(
-        f"🎲 **Случайное видео:**\n🎥 **{video['name']}**\n\n{video['url']}",
-        disable_web_page_preview=False
-    )
+    
+    # Отправляем статус
+    status_msg = await message.reply(f"🎲 Случайное видео: {video['name']}\n⏬ Скачиваю...")
+    
+    # Скачиваем видео
+    file_path = await download_video(video['url'])
+    
+    if file_path and os.path.exists(file_path):
+        # Отправляем видео
+        await message.reply_video(
+            video=FSInputFile(file_path),
+            caption=f"🎲 {video['name']}"
+        )
+        
+        # Удаляем временный файл
+        os.unlink(file_path)
+        os.rmdir(os.path.dirname(file_path))
+        
+        # Удаляем статус
+        await status_msg.delete()
+    else:
+        await status_msg.edit_text(f"❌ Не удалось скачать видео: {video['name']}\nПопробуй позже.")
 
 # ================ КОМАНДЫ МУТА ================
 @dp.message(Command("mute"))
