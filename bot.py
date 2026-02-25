@@ -239,7 +239,7 @@ async def cmd_help(message: types.Message):
 **Другое:**
 /myid — узнать свой Telegram ID
     """
-    await message.reply(help_text, parse_mode="Markdown")
+    await message.reply(help_text)
 
 # ================ ВИДЕО КОМАНДЫ ================
 @dp.message(Command("videos"))
@@ -539,3 +539,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
