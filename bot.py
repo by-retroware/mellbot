@@ -693,6 +693,7 @@ async def main():
     app = web.Application()
     app.router.add_post(WEBHOOK_PATH, handle_webhook)
     app.router.add_get("/health", health_check)
+    app.router.add_get("/", lambda r: web.Response(text="Bot is running!"))
 
     app.on_startup.append(lambda _: asyncio.create_task(on_startup()))
     app.on_shutdown.append(lambda _: asyncio.create_task(on_shutdown()))
@@ -708,4 +709,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
