@@ -69,10 +69,6 @@ async def check_spam(message: types.Message) -> bool:
     now = datetime.now()
     text = message.text or message.caption or ""
 
-    # Проверка на плохие слова
-    if any(bad_word in text.lower() for bad_word in BAD_WORDS):
-        await message.reply("⚠️ Не выражайся!")
-
     # Проверка на частые сообщения
     user_spam_data[user_id].append(now)
     # Оставляем только сообщения за последние 30 секунд
@@ -267,20 +263,18 @@ async def cmd_help(message: types.Message):
 
 # ================ ВИДЕО КОМАНДЫ ================
 
-# Храним текущую страницу для каждого чата (чтобы не сбрасывалась)
+# Храним текущую страницу для каждого чата
 user_pages = {}
 
 @dp.message(Command("videos"))
 async def cmd_videos(message: types.Message):
+    """Обработчик команды /videos"""
     if not VIDEO_LIBRARY:
         await message.reply("📭 Видео пока нет")
         return
     
-    # Сбрасываем на первую страницу при новом вызове
-    chat_id = message.chat.id
-    user_pages[chat_id] = 0
-    
-    await show_video_page(message.chat.id, message.message_id, 0)
+    # Показываем первую страницу
+    await show_video_page(message.chat.id, None, 0)
 
 async def show_video_page(chat_id, message_id, page):
     """Показывает страницу с видео и кнопками навигации"""
@@ -298,7 +292,7 @@ async def show_video_page(chat_id, message_id, page):
     response += f"\nСтраница {page+1} из {total_pages}\n"
     response += "👇 Выбери видео по номеру или листай страницы"
     
-    # Создаём кнопки с номерами (по 5 в ряд)
+    # Создаём кнопки с номерами
     buttons = []
     row = []
     for i in range(start + 1, end + 1):
@@ -320,23 +314,26 @@ async def show_video_page(chat_id, message_id, page):
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     
-    # Редактируем существующее сообщение или отправляем новое
     try:
-        await bot.edit_message_text(
-            response,
-            chat_id=chat_id,
-            message_id=message_id,
-            parse_mode="Markdown",
-            reply_markup=keyboard
-        )
-    except:
-        # Если не получилось отредактировать (новое сообщение)
-        await bot.send_message(
-            chat_id,
-            response,
-            parse_mode="Markdown",
-            reply_markup=keyboard
-        )
+        if message_id:
+            # Редактируем существующее сообщение
+            await bot.edit_message_text(
+                response,
+                chat_id=chat_id,
+                message_id=message_id,
+                parse_mode="Markdown",
+                reply_markup=keyboard
+            )
+        else:
+            # Отправляем новое сообщение
+            await bot.send_message(
+                chat_id,
+                response,
+                parse_mode="Markdown",
+                reply_markup=keyboard
+            )
+    except Exception as e:
+        print(f"Ошибка: {e}")
 
 @dp.callback_query(lambda c: c.data.startswith('page_'))
 async def process_page_callback(callback_query: types.CallbackQuery):
@@ -696,3 +693,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
