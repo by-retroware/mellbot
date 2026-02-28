@@ -43,8 +43,38 @@ VIDEO_LIBRARY = [
     {"name": "танцуем все", "url": "https://vt.tiktok.com/ZSmquBdtT/"},
     {"name": "омайгад нихуя", "url": "https://vt.tiktok.com/ZSmquUGBW/"},
     {"name": "мамино золотце", "url": "https://vt.tiktok.com/ZSmquHoSy/"},
+    {"name": "стоп а где калбаска", "url": "https://drive.google.com/file/d/1VumkUKPFat9NgC-eQGIXHO4phwWFlbqG/view?usp=drive_link"},
+    {"name": "злится", "url": "https://drive.google.com/file/d/13D7FsEdMOsaBWdF6-jaYZ2FnlWzoxTfQ/view?usp=drive_link"},
+    {"name": "а еще я пдф", "url": "https://drive.google.com/file/d/1Q-vVYJHL2-1LIiWJvuVmwB-3-MZNUe72/view?usp=drive_link"},
+    {"name": "ода детка ты такая вкусная конфетка", "url": "https://drive.google.com/file/d/1agzYW3AY-CXRwOkxc-zY1Ox8di_RFdKR/view?usp=drive_link"},
+    {"name": "фу блять нахуй я на это посмотрел", "url": "https://drive.google.com/file/d/1W6Ouijqmhb9Fi1mH69verdU7q6YnskfB/view?usp=drive_link"},
+    {"name": "дай руку", "url": "https://drive.google.com/file/d/1ZEryNZ0-5xjHWnUYKSyBGIqEbrtr8OD7/view?usp=drive_link"},
+    {"name": "прикиньте для него это деньги", "url": "https://drive.google.com/file/d/1NLsKNlALH-i2svnq04CRwXEfUe8a2z-6/view?usp=drive_link"},
+    {"name": "это не сфоткать грех", "url": "https://drive.google.com/file/d/1Pa62ediM0hciul_4484_CtvrkPZMB11r/view?usp=drive_link"},
+    {"name": "нет", "url": "https://drive.google.com/file/d/1LECI2c32SgxWE9oZk_yy9taAqeD9oMOx/view?usp=drive_link"},
+    {"name": "смотрит в бок", "url": "https://drive.google.com/file/d/1Anmr41Ku6AjsN0LqZ0bNzNgkLivtXplS/view?usp=drive_link"},
+    {"name": "обидно блять", "url": "https://drive.google.com/file/d/1p2GTC4-Rf5t964fnWfdYP8M1WnuRwLcT/view?usp=drive_link"},
+    {"name": "заработал нарулил", "url": "https://drive.google.com/file/d/16pv8BQbP-CNmrNdrKbabVQwGGNOPZsq0/view?usp=drive_link"},
+    {"name": "орет( сидя на кресле)", "url": "https://drive.google.com/file/d/1-oBVNGNvzWKobPWOBDj02BsmNpnN5Z8k/view?usp=drive_link"},
+    {"name": "вот с такенной елдой", "url": "https://drive.google.com/file/d/1EwYQuRPIAxkUxlZ_hLmBjcL2GE0XY2jW/view?usp=drive_link"},
+    {"name": "что то заподозрил", "url": "https://drive.google.com/file/d/1BZaRWlONcMH6MXejCIzvnzy92ncW_kR1/view?usp=drive_link"},
+    {"name": "ой ой ой ойойойой", "url": "https://drive.google.com/file/d/1ExryK4H8SCqyfMMvQDfZK7GACTNnOCU9/view?usp=drive_link"},
+    {"name": "я уже красный", "url": "https://drive.google.com/file/d/1UeO8bc3g2d67QSu4SNWi5yUStXD2Bi1s/view?usp=drive_link"},
+    {"name": "это пизда или нармалды", "url": "https://drive.google.com/file/d/1q6UtKVNNaA3KxsFUQcAXpILYZcyys_DX/view?usp=drive_link"},
+    {"name": "ди сюда", "url": "https://drive.google.com/file/d/1qYh4rQFfvBjI6cFCKlOHLfHLF1TRPIze/view?usp=drive_link"},
+    {"name": "ты блять далбаеб нахуй", "url": "https://drive.google.com/file/d/1xCoEGrt0peTbbRnRd8vNLGId0Uq2NBjX/view?usp=drive_link"},
+    {"name": "я заперт на этом острове изза интерпола", "url": "https://drive.google.com/file/d/1s4rM2oS80kE7tL4lFj2kH1wl31vU6frV/view?usp=drive_link"},
+    {"name": "БЛЯЯЯТЬ", "url": "https://drive.google.com/file/d/1rtLkxMTa1w-9uIy7iz_lpa9VdwbU4RJ7/view?usp=drive_link"},
+    {"name": "ахаххаха это пиздец", "url": "https://drive.google.com/file/d/1CLULCG0aQLV4BAOI3_I_D2cXKXESUu5d/view?usp=drive_link"},
+    {"name": "быстрее! быстрее!", "url": "https://drive.google.com/file/d/1ieh1D6Ra4GxPh4G-JBWXQbdwScDykuTZ/view?usp=drive_link"},
+    {"name": "да пошло оно все нахуй тогда", "url": "https://drive.google.com/file/d/1hKGjwk1ioKMCKPR05_TNya91sk7vWPBG/view?usp=drive_link"},
+    {"name": "еще посидим", "url": "https://drive.google.com/file/d/1weiCBSJFUMhZsDtn1v_7nxzIOCUihexs/view?usp=drive_link"},
+    {"name": "не сиси ни жопы", "url": "https://drive.google.com/file/d/1yyhp91mwdt_3pjt3TWicv10Y-IFPXqmO/view?usp=drive_link"},
+    {"name": "блять еесть ессть", "url": "https://drive.google.com/file/d/16KgWrxUgY5sM58I0uQxFgYrLHF9kIs71/view?usp=drive_link"},
+    {"name": "ты чет сука борщищь", "url": "https://drive.google.com/file/d/1EaO-UBJPd9Y85KjiaEciraPVtSJj3947/view?usp=drive_link"},
+    {"name": "ну даже закинь мне лям, нет", "url": "https://drive.google.com/file/d/19XkjrCg5wORgu0h7xDxcKqPtje34y5ko/view?usp=drive_link"},
+    {"name": "вроде да вроде нет", "url": "https://drive.google.com/file/d/12VAi7kHI06mJyjKEqes7MLog8uSIUP62/view?usp=drive_link"},
 ]
-
 # ================ ФУНКЦИЯ СКАЧИВАНИЯ ВИДЕО ================
 
 async def download_video(url):
@@ -539,4 +569,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
