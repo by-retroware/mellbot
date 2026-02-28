@@ -296,7 +296,8 @@ async def show_video_page(chat_id, message_id, page):
     buttons = []
     row = []
     for i in range(start + 1, end + 1):
-        row.append(InlineKeyboardButton(text=str(i), callback_data=f"video_{i}"))
+        # Используем короткие callback_data чтобы избежать ошибок
+        row.append(InlineKeyboardButton(text=str(i), callback_data=f"vid_{i}"))
         if len(row) == 5:
             buttons.append(row)
             row = []
@@ -306,9 +307,9 @@ async def show_video_page(chat_id, message_id, page):
     # Кнопки навигации
     nav_row = []
     if page > 0:
-        nav_row.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"page_{page-1}"))
+        nav_row.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"prev_{page-1}"))
     if page < total_pages - 1:
-        nav_row.append(InlineKeyboardButton(text="Вперёд ➡️", callback_data=f"page_{page+1}"))
+        nav_row.append(InlineKeyboardButton(text="Вперёд ➡️", callback_data=f"next_{page+1}"))
     if nav_row:
         buttons.append(nav_row)
     
@@ -335,9 +336,9 @@ async def show_video_page(chat_id, message_id, page):
     except Exception as e:
         print(f"Ошибка: {e}")
 
-@dp.callback_query(lambda c: c.data.startswith('page_'))
-async def process_page_callback(callback_query: types.CallbackQuery):
-    """Обработчик переключения страниц"""
+@dp.callback_query(lambda c: c.data.startswith('prev_'))
+async def process_prev_page(callback_query: types.CallbackQuery):
+    """Обработчик кнопки Назад"""
     page = int(callback_query.data.split('_')[1])
     await show_video_page(
         callback_query.message.chat.id,
@@ -346,31 +347,45 @@ async def process_page_callback(callback_query: types.CallbackQuery):
     )
     await callback_query.answer()
 
-@dp.callback_query(lambda c: c.data.startswith('video_'))
+@dp.callback_query(lambda c: c.data.startswith('next_'))
+async def process_next_page(callback_query: types.CallbackQuery):
+    """Обработчик кнопки Вперёд"""
+    page = int(callback_query.data.split('_')[1])
+    await show_video_page(
+        callback_query.message.chat.id,
+        callback_query.message.message_id,
+        page
+    )
+    await callback_query.answer()
+
+@dp.callback_query(lambda c: c.data.startswith('vid_'))
 async def process_video_callback(callback_query: types.CallbackQuery):
     """Обработчик выбора видео"""
-    num = int(callback_query.data.split('_')[1]) - 1
-    if num < 0 or num >= len(VIDEO_LIBRARY):
-        await callback_query.answer("❌ Неверный номер")
-        return
+    try:
+        num = int(callback_query.data.split('_')[1]) - 1
+        if num < 0 or num >= len(VIDEO_LIBRARY):
+            await callback_query.answer("❌ Неверный номер")
+            return
 
-    video = VIDEO_LIBRARY[num]
-    await callback_query.message.answer(f"⏬ Скачиваю: {video['name']}...")
+        video = VIDEO_LIBRARY[num]
+        await callback_query.message.answer(f"⏬ Скачиваю: {video['name']}...")
 
-    file_path = await download_video(video['url'])
-    if file_path and os.path.exists(file_path):
-        update_video_stat(video['url'], video['name'])
-        await callback_query.message.reply_video(
-            video=FSInputFile(file_path),
-            caption=f"🎥 {video['name']}",
-            has_spoiler=True
-        )
-        os.unlink(file_path)
-        os.rmdir(os.path.dirname(file_path))
-    else:
-        await callback_query.message.answer(f"❌ Не удалось скачать видео: {video['name']}")
+        file_path = await download_video(video['url'])
+        if file_path and os.path.exists(file_path):
+            update_video_stat(video['url'], video['name'])
+            await callback_query.message.reply_video(
+                video=FSInputFile(file_path),
+                caption=f"🎥 {video['name']}"
+            )
+            os.unlink(file_path)
+            os.rmdir(os.path.dirname(file_path))
+        else:
+            await callback_query.message.answer(f"❌ Не удалось скачать видео: {video['name']}")
 
-    await callback_query.answer()
+        await callback_query.answer()
+    except Exception as e:
+        print(f"Ошибка в video_callback: {e}")
+        await callback_query.answer("❌ Произошла ошибка")
 
 @dp.message(Command("searchvideo"))
 async def cmd_search_video(message: types.Message):
