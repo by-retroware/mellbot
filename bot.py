@@ -274,7 +274,7 @@ async def cmd_videos(message: types.Message):
         return
 
     response = "🎬 **Список видео (первые 10):**\n\n"
-    for i, video in enumerate(VIDEO_LIBRARY[:10], 1):
+    for i, video in enumerate(VIDEO_LIBRARY, 1):
         response += f"{i}. {video['name']}\n"
     response += "\nВыбери видео по номеру 👇 или используй /video [номер]"
 
@@ -639,3 +639,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
