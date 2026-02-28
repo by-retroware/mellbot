@@ -267,32 +267,91 @@ async def cmd_help(message: types.Message):
 
 # ================ ВИДЕО КОМАНДЫ ================
 
+# Храним текущую страницу для каждого чата (чтобы не сбрасывалась)
+user_pages = {}
+
 @dp.message(Command("videos"))
 async def cmd_videos(message: types.Message):
     if not VIDEO_LIBRARY:
         await message.reply("📭 Видео пока нет")
         return
+    
+    # Сбрасываем на первую страницу при новом вызове
+    chat_id = message.chat.id
+    user_pages[chat_id] = 0
+    
+    await show_video_page(message.chat.id, message.message_id, 0)
 
-    response = "🎬 **Список видео (первые 10):**\n\n"
-    for i, video in enumerate(VIDEO_LIBRARY, 1):
-        response += f"{i}. {video['name']}\n"
-    response += "\nВыбери видео по номеру 👇 или используй /video [номер]"
-
+async def show_video_page(chat_id, message_id, page):
+    """Показывает страницу с видео и кнопками навигации"""
+    videos_per_page = 10
+    total_videos = len(VIDEO_LIBRARY)
+    total_pages = (total_videos + videos_per_page - 1) // videos_per_page
+    
+    start = page * videos_per_page
+    end = min(start + videos_per_page, total_videos)
+    
+    # Формируем текст
+    response = f"🎬 **Видео ({start+1}-{end} из {total_videos})**\n\n"
+    for i in range(start, end):
+        response += f"{i+1}. {VIDEO_LIBRARY[i]['name']}\n"
+    response += f"\nСтраница {page+1} из {total_pages}\n"
+    response += "👇 Выбери видео по номеру или листай страницы"
+    
+    # Создаём кнопки с номерами (по 5 в ряд)
     buttons = []
     row = []
-    for i in range(1, min(11, len(VIDEO_LIBRARY)+1)):
+    for i in range(start + 1, end + 1):
         row.append(InlineKeyboardButton(text=str(i), callback_data=f"video_{i}"))
-        if i % 5 == 0:
+        if len(row) == 5:
             buttons.append(row)
             row = []
     if row:
         buttons.append(row)
-
+    
+    # Кнопки навигации
+    nav_row = []
+    if page > 0:
+        nav_row.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"page_{page-1}"))
+    if page < total_pages - 1:
+        nav_row.append(InlineKeyboardButton(text="Вперёд ➡️", callback_data=f"page_{page+1}"))
+    if nav_row:
+        buttons.append(nav_row)
+    
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-    await message.reply(response, parse_mode="Markdown", reply_markup=keyboard)
+    
+    # Редактируем существующее сообщение или отправляем новое
+    try:
+        await bot.edit_message_text(
+            response,
+            chat_id=chat_id,
+            message_id=message_id,
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
+    except:
+        # Если не получилось отредактировать (новое сообщение)
+        await bot.send_message(
+            chat_id,
+            response,
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
+
+@dp.callback_query(lambda c: c.data.startswith('page_'))
+async def process_page_callback(callback_query: types.CallbackQuery):
+    """Обработчик переключения страниц"""
+    page = int(callback_query.data.split('_')[1])
+    await show_video_page(
+        callback_query.message.chat.id,
+        callback_query.message.message_id,
+        page
+    )
+    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data.startswith('video_'))
 async def process_video_callback(callback_query: types.CallbackQuery):
+    """Обработчик выбора видео"""
     num = int(callback_query.data.split('_')[1]) - 1
     if num < 0 or num >= len(VIDEO_LIBRARY):
         await callback_query.answer("❌ Неверный номер")
@@ -304,12 +363,10 @@ async def process_video_callback(callback_query: types.CallbackQuery):
     file_path = await download_video(video['url'])
     if file_path and os.path.exists(file_path):
         update_video_stat(video['url'], video['name'])
-
-        # Отправляем видео со спойлером
         await callback_query.message.reply_video(
             video=FSInputFile(file_path),
             caption=f"🎥 {video['name']}",
-            has_spoiler=True  # СПОЙЛЕР! Видно только после нажатия
+            has_spoiler=True
         )
         os.unlink(file_path)
         os.rmdir(os.path.dirname(file_path))
@@ -639,4 +696,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
