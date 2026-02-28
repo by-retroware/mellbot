@@ -622,4 +622,20 @@ async def health_check(request):
 
 async def main():
     app = web.Application()
-    app
+    app.router.add_post(WEBHOOK_PATH, handle_webhook)
+    app.router.add_get("/health", health_check)
+
+    app.on_startup.append(lambda _: asyncio.create_task(on_startup()))
+    app.on_shutdown.append(lambda _: asyncio.create_task(on_shutdown()))
+
+    port = int(os.environ.get("PORT", 8000))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"🚀 Сервер запущен на порту {port}")
+
+    await asyncio.Event().wait()
+
+if __name__ == "__main__":
+    asyncio.run(main())
